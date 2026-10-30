@@ -20,6 +20,13 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "components/Gauge.tsx",
+    "components/Recommendation.tsx",
+    "components/ScoreTag.tsx",
+    "components/Toast.tsx",
+    "components/Accordion.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

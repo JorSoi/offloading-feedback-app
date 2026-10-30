@@ -36,12 +36,22 @@ export default function Toast({ offloadingData }: { offloadingData: OffloadingDa
   }, []);
 
   return (
-    <div className="toast-content max-h-full overflow-y-auto rounded-2xl bg-white p-5 shadow-[0_4px_16px_rgba(0,0,0,0.2)] relative">
-      <div className="flex gap-2 items-center">
-        <h1 className="font-semibold text-[15px]">Your AI usage</h1>
-        <Info className="size-4 opacity-70 cursor-pointer" />
+    <div className="toast-content max-h-full overflow-y-auto rounded-2xl bg-white p-5 relative border-slate-300 border-1">
+      <div className="flex justify-between fixed z-10 bg-linear-to-b from-white to transparent top-px left-px right-px rounded-tl-2xl rounded-tr-2xl pt-3 px-4 pl-4 pb-5 via-80% via-white/50 from-70%">
+        <div className="flex gap-2 items-center">
+          <h1 className="font-semibold text-[15px]">Your AI usage</h1>
+          <Info className="size-4 opacity-70 cursor-pointer" />
+        </div>
+
+        <button
+          onClick={close}
+          className="p-1.5 border-[#d3d3d3] border rounded-xl cursor-pointer hover:bg-slate-100"
+        >
+          <X className="size-4.5 opacity-50" />
+        </button>
       </div>
-      <div className="flex justify-center mt-5">
+
+      <div className="flex justify-center mt-5 pt-7">
         <Gauge score={offloadingScore} />
       </div>
       <div className="flex justify-center mb-4">
@@ -61,13 +71,6 @@ export default function Toast({ offloadingData }: { offloadingData: OffloadingDa
       {offloadingData.recommendation && (
         <Recommendation recommendation={offloadingData.recommendation.description} />
       )}
-
-      <button
-        onClick={close}
-        className="absolute top-3.5 right-3.5 p-1.5 border-[#d3d3d3] border rounded-xl cursor-pointer hover:bg-slate-100"
-      >
-        <X className="size-4.5 opacity-50" />
-      </button>
     </div>
   );
 }

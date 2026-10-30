@@ -1,24 +1,26 @@
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
-import Toast, { type OffloadingData } from "./Toast";
+import Toast, { type OffloadingData } from "../components/Toast";
 import "./App.css";
 
 const offloadingExamples: OffloadingData[] = [
   {
-    score: 20,
+    score: 25,
     explanation: {
       title: "You do most of the thinking",
       description: "You use AI for occasional support while making the key decisions yourself.",
     },
     consequences: {
       title: "You stay actively engaged",
-      description: "You build your own skills, though doing everything yourself can take more time.",
+      description:
+        "You build your own skills, though doing everything yourself can take more time.",
     },
   },
   {
-    score: 50,
+    score: 51,
     explanation: {
       title: "You share the thinking with AI",
-      description: "You use AI for meaningful parts of your work while staying involved in the outcome.",
+      description:
+        "You use AI for meaningful parts of your work while staying involved in the outcome.",
     },
     consequences: {
       title: "You balance help and practice",
@@ -30,24 +32,27 @@ const offloadingExamples: OffloadingData[] = [
     },
   },
   {
-    score: 85,
+    score: 88,
     explanation: {
       title: "AI does most of the thinking",
-      description: "You rely on AI for most of the reasoning and accept its output with little review.",
+      description:
+        "You rely on AI for most of the reasoning and accept its output with little review.",
     },
     consequences: {
       title: "You may miss errors and lose practice",
-      description: "Unreviewed output can contain mistakes, and relying on it may weaken your own skills.",
+      description:
+        "Unreviewed output can contain mistakes, and relying on it may weaken your own skills.",
     },
     recommendation: {
       title: "Verify before you rely on it",
-      description: "Check important claims and redo key reasoning yourself before using the result.",
+      description:
+        "Check important claims and redo key reasoning yourself before using the result.",
     },
   },
 ];
 
 function showToast() {
-  const width = 320;
+  const width = 330;
   const height = 510;
   const margin = 16;
 
@@ -63,6 +68,7 @@ function showToast() {
     resizable: false,
     focus: false,
     transparent: true,
+    shadow: true
   });
 
   void toastWindow.once("tauri://error", (error) => {

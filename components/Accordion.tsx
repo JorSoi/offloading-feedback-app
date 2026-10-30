@@ -5,7 +5,7 @@ function Accordion({ title, description }: { title: string; description: string 
 
   return (
     <div
-      className="bg-[#eaeee9] rounded-lg px-3 py-2 cursor-pointer hover:bg-[#d7dbd6] transition-colors"
+      className="bg-[#eaeee9] rounded-xl px-3 py-2 cursor-pointer hover:bg-[#d7dbd6] transition-colors"
       onClick={() => setOpen(!isOpen)}
     >
       <div className="flex items-center gap-2">
