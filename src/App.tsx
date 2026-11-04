@@ -1,6 +1,8 @@
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { invoke } from "@tauri-apps/api/core";
 import Toast, { type OffloadingData } from "../components/Toast";
 import "./App.css";
+import { useState } from "react";
 
 const offloadingExamples: OffloadingData[] = [
   {
@@ -68,7 +70,7 @@ function showToast() {
     resizable: false,
     focus: false,
     transparent: true,
-    shadow: true
+    shadow: true,
   });
 
   void toastWindow.once("tauri://error", (error) => {
@@ -78,7 +80,19 @@ function showToast() {
 
 function App() {
   const isToast = new URLSearchParams(window.location.search).has("toast");
-  if (isToast) return <Toast offloadingData={offloadingExamples[2]} />;
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingError, setRecordingError] = useState<string | null>(null);
+  if (isToast) return <Toast offloadingData={offloadingExamples[1]} />;
+
+  const handleRecording = async () => {
+    setRecordingError(null);
+    try {
+      await invoke(isRecording ? "stop_recording" : "start_recording");
+      setIsRecording(!isRecording);
+    } catch (error) {
+      setRecordingError(String(error));
+    }
+  };
 
   return (
     <main className="m-0 flex flex-col items-center pt-[10vh] text-center ">
@@ -89,6 +103,19 @@ function App() {
       >
         Show toast
       </button>
+
+      <button
+        className="flex gap-2 mt-4 cursor-pointer rounded-lg border border-transparent bg-white px-[1.2em] py-[0.6em] font-medium text-[#0f0f0f] shadow-sm transition hover:border-[#396cd8] active:border-[#396cd8] active:bg-[#e8e8e8] items-center"
+        onClick={handleRecording}
+      >
+        {isRecording && <div className="size-2 bg-red-500 rounded-full"></div>}
+        {`${isRecording ? "Stop" : "Start"} Recording`}
+      </button>
+      {recordingError && (
+        <p role="alert" className="mt-2 max-w-md text-sm text-red-600">
+          {recordingError}
+        </p>
+      )}
     </main>
   );
 }
