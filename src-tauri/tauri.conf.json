@@ -13,10 +13,17 @@
     "windows": [
       {
         "title": "offloading-score-app",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "decorations": true,
         "width": 800,
         "height": 600
       }
     ],
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
     "security": {
       "csp": null
     }
@@ -24,6 +31,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "resources": ["scripts/workflow_induction_bridge.py", "scripts/workflow_induction/**/*"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
