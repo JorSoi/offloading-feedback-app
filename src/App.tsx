@@ -1,15 +1,13 @@
-import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import Toast, { type OffloadingData } from "../components/Toast";
+import PermissionItem from "../components/PermissionItem";
+import DebugPanel, {
+  type WorkflowStep,
+  type WorkflowTrace,
+} from "../components/DebugPanel";
 import "./App.css";
 import { useEffect, useState } from "react";
-
-type WorkflowStep = {
-  goal: string;
-  actions: number;
-  status: string;
-};
 
 type WorkflowUpdate = {
   steps: WorkflowStep[];
@@ -18,14 +16,6 @@ type WorkflowUpdate = {
 
 type WorkflowStatus = {
   message: string;
-};
-
-type WorkflowTrace = {
-  observations: number;
-  matched_actions: number;
-  waiting_for_screenshots: number;
-  buffered_actions: number;
-  latest_action_type: string | null;
 };
 
 const offloadingExamples: OffloadingData[] = [
@@ -77,30 +67,12 @@ const offloadingExamples: OffloadingData[] = [
   },
 ];
 
-function showToast() {
-  const width = 330;
-  const height = 510;
-  const margin = 16;
-
-  const toastWindow = new WebviewWindow(`toast-${Date.now()}`, {
-    url: "index.html?toast=1",
-    width,
-    height,
-    x: window.screen.width - width - margin,
-    y: window.screen.availHeight - height - margin,
-    decorations: false,
-    alwaysOnTop: true,
-    visibleOnAllWorkspaces: true,
-    resizable: false,
-    focus: false,
-    transparent: true,
-    shadow: true,
-  });
-
-  void toastWindow.once("tauri://error", (error) => {
-    console.error("Failed to create toast window:", error);
-  });
-}
+const permissions = [
+  { title: "Downloads Folder", hasPermission: true },
+  { title: "Screen Capture", hasPermission: true },
+  { title: "Accessibility", hasPermission: true },
+  { title: "Input Monitoring", hasPermission: true },
+];
 
 function App() {
   const isToast = new URLSearchParams(window.location.search).has("toast");
@@ -172,69 +144,66 @@ function App() {
   };
 
   return (
-    <main className="m-0 flex flex-col items-center pt-[10vh] text-center ">
-      <div>Offloading & AI Feedback</div>
-      <button
-        className="mt-4 cursor-pointer rounded-lg border border-transparent bg-white px-[1.2em] py-[0.6em] font-medium text-[#0f0f0f] shadow-sm transition hover:border-[#396cd8] active:border-[#396cd8] active:bg-[#e8e8e8]"
-        onClick={showToast}
-      >
-        Show toast
-      </button>
+    <main className="m-0 bg-[#F6F6F6] pt-[10vh] p-[3%]">
+      <h1 className="text-xl font-medium">Realtime AI Feedback</h1>
+      <p className="text-[#383B47]">
+        Press start, work as usual, and get feedback on your AI usage when you stop.
+      </p>
 
-      <button
-        className="flex gap-2 mt-4 cursor-pointer rounded-lg border border-transparent bg-white px-[1.2em] py-[0.6em] font-medium text-[#0f0f0f] shadow-sm transition hover:border-[#396cd8] active:border-[#396cd8] active:bg-[#e8e8e8] items-center"
-        onClick={handleRecording}
-        disabled={isRecordingBusy}
-      >
-        {isRecording && <div className="size-2 bg-red-500 rounded-full"></div>}
-        {isRecordingBusy
-          ? isRecording
-            ? "Finalizing…"
-            : "Starting…"
-          : `${isRecording ? "Stop" : "Start"} Recording`}
-      </button>
-      {recordingError && (
-        <p role="alert" className="mt-2 max-w-md text-sm text-red-600">
-          {recordingError}
-        </p>
-      )}
-      <section
-        aria-label="Current induced workflow"
-        aria-live="polite"
-        className="mt-4 w-[min(90vw,32rem)] rounded-lg border border-gray-200 bg-white p-3 text-left shadow-sm"
-      >
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold">Workflow debug</h2>
-          <span className="text-xs text-gray-500">{workflowStatus}</span>
+      <div className="p-7 bg-white border border-[#e4e4e4] rounded-2xl mt-10">
+        <p className=" font-medium">Getting started</p>
+        <p className="text-[#383B47]">Complete these 4 steps to enable feedback</p>
+        <div className="mt-4 flex flex-col gap-5">
+          {permissions.map((permission, idx) => (
+            <PermissionItem
+              key={permission.title}
+              hasPermission={permission.hasPermission}
+              idx={idx + 1}
+              permissionTitle={permission.title}
+            />
+          ))}
         </div>
-        {workflowTrace && (
-          <p className="mt-1 text-xs text-gray-500">
-            {workflowTrace.observations} recorded · {workflowTrace.matched_actions} matched to
-            screenshots · {workflowTrace.waiting_for_screenshots} waiting for screenshots ·{" "}
-            {workflowTrace.buffered_actions} buffered
-            {workflowTrace.latest_action_type && ` · latest: ${workflowTrace.latest_action_type}`}
+      </div>
+
+      <div className="p-7  bg-white border border-[#e4e4e4] rounded-2xl mt-4 relative gap-4 overflow-hidden flex justify-between items-center">
+        <div>
+          <p className=" font-medium">Start Observing </p>
+          <p className="text-[#383B47] max-w-100">
+            Press start, work as usual, and get feedback on your AI usage.
+          </p>
+        </div>
+        <button
+          className="shrink-0 whitespace-nowrap bg-[#2F69FF] px-3 py-2 relative z-2 rounded-xl font-medium text-white mr-10 cursor-pointer hover:bg-[#2855b7] active:bg-[#396cd8] transition"
+          onClick={handleRecording}
+          disabled={isRecordingBusy}
+        >
+          {isRecordingBusy
+            ? isRecording
+              ? "Finalizing…"
+              : "Starting…"
+            : `${isRecording ? "Stop" : "Start"} Observing`}
+        </button>
+        <div className="absolute -top-80 -right-50 z-0 size-150 bg-radial-[closest-side] from-[#2FC1FF]/40 via-[#2FC1FF]/30 to-transparent"></div>
+        <img
+          src="/gauge-decoration.png"
+          alt="AI usage gauge"
+          className="block h-auto w-42 absolute -top-1.5 -right-8 z-1"
+        />
+        {recordingError && (
+          <p role="alert" className="absolute bottom-3 left-7 text-sm text-red-600">
+            {recordingError}
           </p>
         )}
-        {workflowError && (
-          <p role="alert" className="mt-2 text-sm text-red-600">
-            {workflowError}
-          </p>
-        )}
-        {workflowSteps.length === 0 ? (
-          <p className="mt-2 text-sm text-gray-500">No workflow steps yet.</p>
-        ) : (
-          <ol className="mt-2 max-h-52 list-decimal space-y-1 overflow-y-auto pl-5 text-sm">
-            {workflowSteps.map((step, index) => (
-              <li key={`${index}-${step.goal}`}>
-                <span>{step.goal}</span>
-                <span className="ml-2 text-xs text-gray-500">
-                  {step.actions} action{step.actions === 1 ? "" : "s"} · {step.status}
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+      </div>
+
+      {isRecording && (
+        <DebugPanel
+          workflowStatus={workflowStatus}
+          workflowSteps={workflowSteps}
+          workflowTrace={workflowTrace}
+          workflowError={workflowError}
+        />
+      )}
     </main>
   );
 }

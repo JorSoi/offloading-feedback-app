@@ -13,6 +13,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 html.toast-window,
 html.toast-window body,
 html.toast-window #root {
