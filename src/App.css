@@ -44,3 +44,17 @@ html.toast-window body {
 .toast-content::-webkit-scrollbar {
   display: none;
 }
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.toast-enter {
+  opacity: 0;
+  animation: toast-enter 280ms ease-in-out both;
+}

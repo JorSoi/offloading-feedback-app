@@ -2,12 +2,10 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import Toast, { type OffloadingData } from "../components/Toast";
 import PermissionItem from "../components/PermissionItem";
-import DebugPanel, {
-  type WorkflowStep,
-  type WorkflowTrace,
-} from "../components/DebugPanel";
+import DebugPanel, { type WorkflowStep, type WorkflowTrace } from "../components/DebugPanel";
 import "./App.css";
 import { useEffect, useState } from "react";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
 type WorkflowUpdate = {
   steps: WorkflowStep[];
@@ -48,7 +46,7 @@ const offloadingExamples: OffloadingData[] = [
     },
   },
   {
-    score: 88,
+    score: 87,
     explanation: {
       title: "AI does most of the thinking",
       description:
@@ -73,6 +71,8 @@ const permissions = [
   { title: "Accessibility", hasPermission: true },
   { title: "Input Monitoring", hasPermission: true },
 ];
+
+const TOAST_INTERVAL_MS = 0.3 * 60_000;
 
 function App() {
   const isToast = new URLSearchParams(window.location.search).has("toast");
@@ -121,6 +121,38 @@ function App() {
     };
   }, [isToast]);
 
+  function showToast() {
+    const width = 330;
+    const height = 510;
+    const margin = 16;
+
+    const toastWindow = new WebviewWindow(`toast-${Date.now()}`, {
+      url: "index.html?toast=1",
+      width,
+      height,
+      x: window.screen.width - width - margin,
+      y: window.screen.availHeight - height - margin,
+      decorations: false,
+      alwaysOnTop: true,
+      visibleOnAllWorkspaces: true,
+      resizable: false,
+      focus: false,
+      transparent: true,
+      shadow: true,
+    });
+
+    void toastWindow.once("tauri://error", (error) => {
+      console.error("Failed to create toast window:", error);
+    });
+  }
+
+  useEffect(() => {
+    if (!isRecording || isToast) return;
+
+    const intervalId = window.setInterval(showToast, TOAST_INTERVAL_MS);
+    return () => window.clearInterval(intervalId);
+  }, [isRecording, isToast]);
+
   if (isToast) return <Toast offloadingData={offloadingExamples[2]} />;
 
   const handleRecording = async () => {
@@ -144,14 +176,16 @@ function App() {
   };
 
   return (
-    <main className="m-0 bg-[#F6F6F6] pt-[10vh] p-[3%]">
+    <main className="m-0 bg-[#F6F6F6] pt-[5vh] p-[3%]">
       <h1 className="text-xl font-medium">Realtime AI Feedback</h1>
       <p className="text-[#383B47]">
         Press start, work as usual, and get feedback on your AI usage when you stop.
       </p>
 
-      <div className="p-7 bg-white border border-[#e4e4e4] rounded-2xl mt-10">
-        <p className=" font-medium">Getting started</p>
+      <div className="p-7 bg-white border border-[#e4e4e4] rounded-2xl mt-8">
+        <p className=" font-medium" onClick={showToast}>
+          Getting started
+        </p>
         <p className="text-[#383B47]">Complete these 4 steps to enable feedback</p>
         <div className="mt-4 flex flex-col gap-5">
           {permissions.map((permission, idx) => (

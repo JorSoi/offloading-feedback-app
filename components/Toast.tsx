@@ -1,6 +1,6 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Info, X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Gauge from "./Gauge";
 import Accordion from "./Accordion";
 import ScoreTag from "./ScoreTag";
@@ -25,18 +25,20 @@ export type OffloadingData = {
 export default function Toast({ offloadingData }: { offloadingData: OffloadingData }) {
   const close = () => getCurrentWindow().close();
   const offloadingScore = offloadingData.score;
+  const [displayedScore, setDisplayedScore] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.add("toast-window");
+    setDisplayedScore(offloadingScore);
     const t = setTimeout(close, 1000000); // auto dismiss
     return () => {
       clearTimeout(t);
       document.documentElement.classList.remove("toast-window");
     };
-  }, []);
+  }, [offloadingScore]);
 
   return (
-    <div className="toast-content max-h-full overflow-y-auto rounded-2xl bg-white p-5 relative border-slate-300 border-1">
+    <div className="toast-content toast-enter max-h-full overflow-y-auto rounded-2xl bg-white p-5 relative border-slate-300 border-1">
       <div className="flex justify-between fixed z-10 bg-linear-to-b from-white to transparent top-px left-px right-px rounded-tl-2xl rounded-tr-2xl pt-3 px-4 pl-4 pb-5 via-80% via-white/50 from-70%">
         <div className="flex gap-2 items-center">
           <h1 className="font-semibold text-[15px]">Your AI usage</h1>
@@ -52,7 +54,7 @@ export default function Toast({ offloadingData }: { offloadingData: OffloadingDa
       </div>
 
       <div className="flex justify-center mt-5 pt-7">
-        <Gauge score={offloadingScore} />
+        <Gauge score={displayedScore} />
       </div>
       <div className="flex justify-center mb-4">
         <ScoreTag score={offloadingScore} />

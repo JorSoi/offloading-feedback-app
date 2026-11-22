@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "offloading-score-app",
+  "productName": "Offloading Score Feedback",
   "version": "0.1.0",
   "identifier": "com.jorimsoika.offloading-score-app",
   "build": {
@@ -12,10 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "offloading-score-app",
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true,
-        "decorations": true,
+        "title": "Offloading Score Feedback [PoC]",
         "width": 800,
         "height": 600
       }
